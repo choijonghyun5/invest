@@ -45,7 +45,7 @@ const stage={
  card:()=>`<div class="gs"><div class="pk" id="o-card"><div class="cf">${CL[gcur-1]}</div><div class="cf cb" id="o-cb"></div></div></div>`};
 const gcard=(t,d,k,ctl,btn)=>`<div class="card" style="margin-top:12px"><b>${t}</b><div class="sub" style="margin-bottom:10px">${d}</div>${stage[k]()}${ctl}<div class="sub" id="gp-${k}" style="text-align:center;margin-bottom:10px">승리 확률 ${(probs()[k]*100).toFixed(1)}%</div><button class="btn w" style="margin-top:4px" onclick="${btn}" ${S.gm<=0?'disabled':''}>플레이</button></div>`;
 gameView=function(){return`<div class="sub" style="cursor:pointer;margin-bottom:14px" onclick="tab='more';render()">‹ 더보기</div><h1 style="margin-bottom:8px">게임</h1><div class="sub" style="margin-bottom:14px;line-height:1.6">게임머니는 모두 가상 화폐이며, 아래 환전 기능으로 가상 현금으로 바꿀 수 있습니다. 실제 돈과는 아무 관련이 없습니다.</div>
- <div class="card"><div class="sub">게임머니</div><div class="big" style="font-size:30px">${gm(S.gm)}</div><div class="sub" style="min-height:22px;margin-top:6px">${gres}</div>${S.gm<=0?chargeBox():''}</div>
+ <div class="card"><div class="sub">게임머니</div><div class="big" style="font-size:30px">${gm(S.gm)}</div><div class="sub" style="min-height:22px;margin-top:6px">${gres}</div>${chargeBox()}</div>
  ${exView()}<div class="lab">베팅 금액</div><input type="number" inputmode="numeric" value="${gbet}" oninput="gbet=+this.value;updateProbs()"><div class="sub" id="gph" style="margin:8px 2px 0">${probs().fb<1?'배팅 금액이 커서 승리 확률이 낮아졌습니다 (×'+probs().fb.toFixed(2)+')':'1만 G를 넘기면 배팅 금액이 클수록 승리 확률이 낮아집니다'}</div>
  ${gcard('코인 플립','맞히면 베팅액만큼 획득','coin',gseg([['h','앞면'],['t','뒷면']],gcoin,'gcoin'),"playG('coin')")}
  ${gcard('주사위','숫자를 맞히면 베팅액의 4배 획득','dice',gseg([1,2,3,4,5,6].map(n=>[n,n]),gdice,'gdice'),"playG('dice')")}
@@ -57,9 +57,14 @@ function boom(){const c=document.createElement('div');c.className='fx';document.
   p.style.cssText=`width:${w}px;height:${w*1.6}px;background:${col[(i+k)%6]}`;c.append(p);
   p.animate([{transform:'translate(-50%,-50%) rotate(0deg)',opacity:1},{transform:`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) rotate(${Math.random()*540}deg)`,opacity:1,offset:.55},{transform:`translate(calc(-50% + ${dx*1.08}px),calc(-50% + ${dy+110}px)) rotate(${Math.random()*720}deg)`,opacity:0}],{duration:1200+Math.random()*500,easing:'cubic-bezier(.2,.7,.3,1)',fill:'forwards'})}},k*220);
  setTimeout(()=>c.remove(),2300)}
-let gch=100000;
-function chargeBox(){return`<div class="sub" style="margin-top:12px">충전할 금액 (G)</div><input type="number" inputmode="numeric" min="1" value="${gch}" oninput="gch=+this.value"><div class="chg">${[[1e4,'1만'],[1e5,'10만'],[1e6,'100만'],[1e7,'1,000만']].map(([v,l])=>`<button class="btn s" onclick="gch=${v};render()">${l}</button>`).join('')}</div><button class="btn s w" onclick="chargeG()">게임머니 충전</button>`}
-function chargeG(){const v=Math.floor(+gch||0);if(!(v>0))return toast('충전할 금액을 입력하세요');S.gm+=v;gres='충전 +'+gm(v);save();render()}
+let gch=10000;
+/* 게임머니 충전: 1 G = ₩1, 보유 현금에서 차감. 현금이 모자라면 충전 불가. 남은 게임머니가 있어도 언제든 추가 충전 가능 */
+function chargeBox(){const v=Math.floor(+gch||0),ok=v>0&&v<=S.cash;
+ return`<div class="sub" style="margin-top:12px;display:flex;justify-content:space-between"><span>충전할 금액 (G)</span><span>보유 현금 ${won(S.cash)}</span></div><input id="chi" type="number" inputmode="numeric" min="1" value="${gch}" oninput="gch=+this.value;chPrev()"><div class="chg">${[[1e4,'1만'],[1e5,'10만'],[1e6,'100만'],[1e7,'1,000만']].map(([v,l])=>`<button class="btn s" onclick="gch=${v};render()">${l}</button>`).join('')}<button class="btn s" onclick="gch=Math.max(0,Math.floor(S.cash));render()">최대</button></div><div class="sub" id="chp" style="margin:2px 0 10px">${chText(v)}</div><button class="btn s w" id="chb" onclick="chargeG()" ${ok?'':'disabled'}>게임머니 충전</button>`}
+function chText(v){return v<=0?'1 G = ₩1 · 충전한 금액만큼 보유 현금에서 빠져나갑니다':v>S.cash?'<span class="fall">현금이 부족합니다 (부족 '+won(v-S.cash)+')</span>':'충전 후 보유 현금 '+won(S.cash-v)}
+function chPrev(){const v=Math.floor(+gch||0),e=document.getElementById('chp'),b=document.getElementById('chb');if(e)e.innerHTML=chText(v);if(b)b.disabled=!(v>0&&v<=S.cash)}
+function chargeG(){const v=Math.floor(+gch||0);if(!(v>0))return toast('충전할 금액을 입력하세요');if(v>S.cash)return toast('현금이 부족합니다');
+ S.cash-=v;S.gm+=v;addTx('etc','게임머니 충전 ('+gm(v)+')',-v);snap();gres='충전 +'+gm(v)+' (현금 -'+won(v)+')';save();render()}
 function anim(el,kf,ms,ease,cb){let d=0;const once=()=>{if(!d){d=1;cb()}};if(!el||!el.animate){setTimeout(once,60);return}
  const a=el.animate(kf,{duration:ms,easing:ease,fill:'forwards'});a.onfinish=once;setTimeout(once,ms+600)}
 function playG(k){if(gbusy)return;const b=Math.floor(gbet);if(!(b>0))return toast('베팅 금액을 입력하세요');if(b>S.gm)return toast('게임머니가 부족합니다');

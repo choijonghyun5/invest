@@ -1,5 +1,5 @@
 /* ===== mini games (virtual game money only, fully separated from assets) ===== */
-const gm=n=>Math.round(n).toLocaleString('ko-KR')+' G';
+const gm=n=>Math.round(n).toLocaleString('ko-KR')+'\u00a0G';
 const gseg=(items,cur,v)=>`<div class="seg" style="margin-top:0">${items.map(([k,l])=>`<button class="${cur===k?'on':''}" onclick="${v}=${typeof k==='number'?k:`'${k}'`};render()">${l}</button>`).join('')}</div>`;
 function gameView(){const g=(t,d,body,k)=>`<div class="card" style="margin-top:12px"><b>${t}</b><div class="sub" style="margin-bottom:12px">${d}</div>${body}<button class="btn w" style="margin-top:4px" onclick="playG('${k}')" ${S.gm<=0?'disabled':''}>플레이</button></div>`;
  return`<div class="sub" style="cursor:pointer;margin-bottom:14px" onclick="tab='more';render()">‹ 더보기</div><h1 style="margin-bottom:8px">게임</h1><div class="sub" style="margin-bottom:14px;line-height:1.6">게임머니는 실제 자산과 완전히 분리되어 있으며 현금이나 투자자산으로 전환할 수 없습니다. 재미를 위한 가상 기능입니다.</div>

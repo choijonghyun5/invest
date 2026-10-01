@@ -59,8 +59,8 @@ table{touch-action:pan-x pan-y}
 :root{--rise:var(--up);--fall:var(--dn)}
 .rise{color:var(--up)}.fall{color:var(--dn)}
 .wh .c.gn{color:#2f8f5b}
-.gt{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;pointer-events:none;background:var(--el);border:1px solid var(--bd);box-shadow:var(--s2);border-radius:22px;padding:22px 32px;text-align:center;min-width:220px;max-width:86vw;animation:gtin 2.1s var(--e) forwards}
-.gt-m{font-size:14px;color:var(--soft)}.gt-r{font-size:26px;font-weight:700;margin-top:4px;letter-spacing:-.02em}
+.gt{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;pointer-events:none;background:var(--el);border:1px solid var(--bd);box-shadow:var(--s2);border-radius:22px;padding:22px 24px;text-align:center;min-width:220px;max-width:94vw;animation:gtin 2.1s var(--e) forwards}
+.gt-m{font-size:14px;color:var(--soft)}.gt-r{font-size:clamp(16px,5vw,20px);font-weight:700;margin-top:4px;letter-spacing:-.02em;white-space:nowrap}
 @keyframes gtin{0%{opacity:0;transform:translate(-50%,-50%) scale(.82)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.98)}}
 .fx{position:fixed;inset:0;z-index:31;pointer-events:none;overflow:hidden}.fx i{position:absolute;left:50%;top:50%;border-radius:2px}
 .chg{display:flex;gap:6px;margin:8px 0}.chg button{flex:1;padding:8px 0;font-size:13px}
