@@ -9,3 +9,10 @@ const ASSETS=[
 const KIND={kr:'한국 주식',us:'미국 주식',etf:'ETF',gold:'금',silver:'은',coin:'코인',bond:'채권'};
 const A=id=>ASSETS.find(a=>a.id===id);
 function fetchPrices(){ASSETS.forEach(a=>{a.o=a.o||a.p;a.p=Math.max(1,a.p*(1+(Math.random()-.5)*a.vol*.5))})} // API 연결 시 이 함수만 교체
+
+/* ===== 난이도 (시작 금액 · 시간당 급여 · 공부 보너스 구간 · 게임 승리 확률 보정). 거래 수수료는 0.015% 고정 ===== */
+const FEE=.00015,DIFF_ORDER=['easy','normal','hard'];
+const DIFF={
+ easy:{n:'쉬움',start:5e5,wage:15000,odds:1,tiers:[[0,0],[2,.1],[4,.2],[6,.35],[8,.5]]},
+ normal:{n:'보통',start:1e5,wage:10320,odds:.85,tiers:[[0,0],[2,.05],[4,.1],[6,.2],[8,.3]]},
+ hard:{n:'어려움',start:5e4,wage:7000,odds:.7,tiers:[[0,0],[3,.02],[5,.05],[8,.1],[10,.15]]}};

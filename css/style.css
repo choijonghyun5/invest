@@ -24,3 +24,17 @@ nav button{flex:1;max-width:120px;border:0;background:none;color:var(--faint);fo
 @keyframes f{from{opacity:0}}@keyframes u{from{transform:translateY(40px);opacity:0}}
 svg{display:block;width:100%}.bar{height:8px;border-radius:99px;background:var(--bd);display:flex;overflow:hidden}.toast{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--ic);padding:10px 18px;border-radius:99px;font-size:13px;font-weight:600;z-index:9;animation:f .2s}
 @media(min-width:900px){body{padding-left:200px}nav{top:0;bottom:auto;width:200px;flex-direction:column;justify-content:flex-start;border-top:0;border-right:1px solid var(--bd);padding:calc(28px + env(safe-area-inset-top,0px)) 12px 12px}nav button{flex:none;max-width:none;text-align:left;font-size:15px;padding:12px 16px;border-radius:12px}nav button.on{background:var(--bg2)}#app{padding-bottom:48px}}
+/* game animations */
+.gs{display:flex;align-items:center;justify-content:center;height:150px;perspective:700px;margin-bottom:10px}
+.coin,.pk{position:relative;transform-style:preserve-3d}
+.coin{width:92px;height:92px}.pk{width:84px;height:118px}
+.cf{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--el);border:2px solid var(--ink);font-weight:700;font-size:26px;color:var(--ink)}
+.coin .cf{border-radius:50%}.pk .cf{border-radius:12px;font-size:36px}
+.coin .cb{transform:rotateX(180deg);background:var(--ink);color:var(--ic)}.pk .cb{transform:rotateY(180deg);background:var(--ink);color:var(--ic)}
+.die{width:84px;height:84px;border:2px solid var(--ink);border-radius:20px;background:var(--el);display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:12px;gap:2px}
+.die i{border-radius:50%;margin:auto;width:11px;height:11px}.die i.on{background:var(--ink)}
+.wh{position:relative;width:150px;height:150px}
+.wh .w{position:absolute;inset:0;border-radius:50%;border:2px solid var(--ink)}
+.wh .c{position:absolute;inset:44px;border-radius:50%;background:var(--el);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px}
+.wh .p{position:absolute;left:50%;top:-8px;transform:translateX(-50%);width:0;height:0;border:7px solid transparent;border-top:12px solid var(--ink);border-bottom:0;z-index:2}
+@media (prefers-reduced-motion:reduce){.coin,.pk,.die,.wh .w{transition:none}}

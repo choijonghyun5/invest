@@ -8,6 +8,6 @@ function finishStudy(sec){
  snap();note('급여 '+sg(base+bonus)+' 지급');
 }
 function toggleTimer(){
- if(run){const el=(Date.now()-run)/1000*(acc?600:1);run=null;finishStudy(el)}else run=Date.now();render()}
-const elapsed=()=>run?(Date.now()-run)/1000*(acc?600:1):0;
+ if(run){const el=(Date.now()-run)/1000;run=null;finishStudy(el)}else run=Date.now();render()}
+const elapsed=()=>run?(Date.now()-run)/1000:0;
 const clock=s=>[s/3600,s%3600/60,s%60].map(x=>String(Math.floor(x)).padStart(2,'0')).join(':');

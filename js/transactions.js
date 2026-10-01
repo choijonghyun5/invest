@@ -1,11 +1,15 @@
 /* ===== trade ===== */
 function trade(id,side,q){
- const a=A(id),gross=a.p*q,fee=gross*S.fee,h=S.hold[id]||{q:0,c:0};
+ const a=A(id),isB=a.k==='bond'&&!!a.b;if(isB)processBonds();
+ const gross=a.p*q,fee=gross*S.fee,h=S.hold[id]||{q:0,c:0};
  if(!(q>0))return toast('수량을 입력하세요');
+ if(isB&&bnow()>=a.b.mat)return toast('만기가 지난 채권입니다');
  if(side==='buy'){if(gross+fee>S.cash)return toast('현금이 부족합니다');
-  S.cash-=gross+fee;S.hold[id]={q:h.q+q,c:(h.q*h.c+gross)/(h.q+q)};addTx(a.k,a.n+' '+q+'개 매수',-(gross+fee))}
+  if(isB&&S.hold[id])bondSettle(id);
+  S.cash-=gross+fee;S.fees=(S.fees||0)+fee;S.hold[id]={...h,q:h.q+q,c:(h.q*h.c+gross)/(h.q+q)};if(isB&&h.t0==null){S.hold[id].t0=bnow();S.hold[id].acc=0}addTx(a.k,a.n+' '+q+'개 매수',-(gross+fee))}
  else{if(q>h.q+1e-9)return toast('보유 수량 초과');
-  S.cash+=gross-fee;S.realized+=(a.p-h.c)*q-fee;h.q-=q;if(h.q<1e-9)delete S.hold[id];addTx(a.k,a.n+' '+q+'개 매도',gross-fee)}
+  let ai=0;if(isB){bondSettle(id);const r=Math.min(1,q/h.q);ai=(h.acc||0)*r*bu(a);h.acc=(h.acc||0)*(1-r)}
+  S.cash+=gross-fee+ai;S.fees=(S.fees||0)+fee;S.realized+=(a.p-h.c)*q-fee;h.q-=q;if(h.q<1e-9)delete S.hold[id];addTx(a.k,a.n+' '+q+'개 매도',gross-fee);if(ai>0)addTx('interest',a.n+' 경과이자',ai)}
  snap();closeM();toast('체결 완료');render()}
 function sheet(inner){document.getElementById('m').innerHTML='<div class="ov" onclick="if(event.target===this)closeM()"><div class="sheet">'+inner+'</div></div>'}
 function closeM(){document.getElementById('m').innerHTML=''}

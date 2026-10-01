@@ -15,11 +15,11 @@ function joinBank(ty){const b=bget(ty);if(b.amt<=0)return toast('금액을 입�
  addTx('bank',(ty==='dep'?'예금 가입 ':'적금 1회차 납입 ')+won(b.amt),-b.amt);snap();closeM();toast('가입 완료');render()}
 function processBank(){let ch=0;const n=Date.now();
  S.bank=S.bank.filter(b=>{
-  if(b.ty==='sav')while(b.paid<b.mo&&n>=b.next){if(S.cash<b.amt)break;S.cash-=b.amt;b.paid++;b.next+=30*DAY;addTx('bank','적금 납입 '+b.paid+'회차',-b.amt);ch=1}
+  if(b.ty==='sav')while(b.paid<b.mo&&n>=b.next){if(S.cash<b.amt){if(b.warn!==b.paid){b.warn=b.paid;note('현금 부족으로 적금 납입이 보류되었습니다')}break}S.cash-=b.amt;b.paid++;b.next+=30*DAY;addTx('bank','적금 납입 '+b.paid+'회차',-b.amt);note('적금 '+b.paid+'회차 납입 '+won(b.amt));ch=1}
+  if(b.ty==='sav'&&b.paid<b.mo&&b.next-n<=DAY&&b.next>n&&b.pre!==b.paid){b.pre=b.paid;note('내일은 적금 납입일입니다 ('+won(b.amt)+')')}
   const done=n>=b.start+b.mo*30*DAY&&(b.ty==='dep'||b.paid>=b.mo);
   if(done){const i=bankInt(b),p=bankPrin(b);S.cash+=p+i;addTx('bank',(b.ty==='dep'?'예금':'적금')+' 만기 원금',p);addTx('interest',(b.ty==='dep'?'예금':'적금')+' 이자수익',i);note('만기 · 이자 '+sg(i));ch=1;return false}
   return true});
- S.lastCoupon=S.lastCoupon||n;while(n-S.lastCoupon>=30*DAY){S.lastCoupon+=30*DAY;const h=S.hold.KTB;if(h){const i=h.q*h.c*.032/12;S.cash+=i;addTx('interest','국채 이자',i);note('국채 이자 '+sg(i));ch=1}}
+ if(processBonds())ch=1;
  if(ch){snap();if(!document.getElementById('m').innerHTML)render()}}
-function skipMonth(){S.lastCoupon=(S.lastCoupon||Date.now())-30*DAY;S.bank.forEach(b=>{b.start-=30*DAY;b.next-=30*DAY});processBank();save();render()}
-function bankView(){return`<div class="lab">예금 · 적금</div><div class="grid g2"><div class="card tap" onclick="openBank('dep')"><b>예금</b><div class="sub">연 3.2% · 목돈 맡기기</div></div><div class="card tap" onclick="openBank('sav')"><b>적금</b><div class="sub">연 3.5% · 매월 자동 납입</div></div></div>`+(S.bank.length?`<div class="card" style="margin-top:12px">${S.bank.map(b=>`<div class="row"><div><b>${b.ty==='dep'?'예금':'적금'} ${won(b.amt)}${b.ty==='sav'?' /월':''}</b><div class="sub">만기 ${new Date(b.start+b.mo*30*DAY).toLocaleDateString('ko-KR')} · 예상 이자 ${won(bankInt(b))}${b.ty==='sav'?' · '+b.paid+'/'+b.mo+'회':''}</div></div><b>${won(bankPrin(b))}</b></div>`).join('')}</div>`:'')+`<button class="btn s w" style="margin-top:10px" onclick="skipMonth()">체험: 1개월 경과 (예금·적금·국채 이자)</button>`}
+function bankView(){return`<div class="lab">예금 · 적금</div><div class="grid g2"><div class="card tap" onclick="openBank('dep')"><b>예금</b><div class="sub">연 3.2% · 목돈 맡기기</div></div><div class="card tap" onclick="openBank('sav')"><b>적금</b><div class="sub">연 3.5% · 매월 자동 납입</div></div></div>`+(S.bank.length?`<div class="card" style="margin-top:12px">${S.bank.map(b=>`<div class="row"><div><b>${b.ty==='dep'?'예금':'적금'} ${won(b.amt)}${b.ty==='sav'?' /월':''}</b><div class="sub">만기 ${new Date(b.start+b.mo*30*DAY).toLocaleDateString('ko-KR')} · 예상 이자 ${won(bankInt(b))}${b.ty==='sav'?' · '+b.paid+'/'+b.mo+'회':''}</div></div><b>${won(bankPrin(b))}</b></div>`).join('')}</div>`:'')}
