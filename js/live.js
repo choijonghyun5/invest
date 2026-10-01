@@ -87,7 +87,7 @@ window.list=function(){_list();const s=q.trim();if(!API)return;if(!s){SQ='';SR=[
  if(el.querySelector('.row')===null)el.innerHTML='';
  el.innerHTML+=(SB&&!R.length?lab('전체 종목 검색 중…'):R.length?lab('전체 종목 검색 결과'):'')+
   (!SB&&!R.length?(SERR==='old'?msg('검색 기능이 없는 이전 버전 Worker입니다. worker/worker.js 코드를 최신으로 교체하고 Deploy해 주세요.'):SERR==='fail'?msg('검색 서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.'):SR.length?'':msg('전체 종목에서도 검색 결과가 없습니다. 종목명, 티커(AAPL), 6자리 종목코드로 검색해 보세요.')):'')+
-  R.map(r=>{const i=SR.indexOf(r);return`<div class=\"row tap\" onclick=\"pickRes(${i})\"><div><b>${esc(r.n)}</b><div class=\"sub\">${KIND[r.k]} · ${esc(r.id)}${r.x?' · '+esc(r.x):''}</div></div><span class=\"sub\">추가</span></div>`}).join('')};
+  (R.length?'<div class="card">':'')+R.map(r=>{const i=SR.indexOf(r);return`<div class=\"row tap\" onclick=\"pickRes(${i})\"><div><b>${esc(r.n)}</b><div class=\"sub\">${KIND[r.k]} · ${esc(r.id)}${r.x?' · '+esc(r.x):''}</div></div><span class=\"sub\">추가</span></div>`}).join('')+(R.length?'</div>':'')};
 async function addAsset(r){if(A(r.id))return true;toast('시세 불러오는 중…');const a=regAsset(r),isKR=/^\d{6}$/.test(r.id);
  try{if(isKR){KR.push(r.id);await krPoll([r.id])}else{const d=await jget('/q?s='+encodeURIComponent(r.y));applyY(a,d[r.y])}}catch(e){}
  if(!(a.p>1)){ASSETS.splice(ASSETS.indexOf(a),1);delete YS[r.id];const i=KR.indexOf(r.id);if(i>=0)KR.splice(i,1);toast('시세를 불러오지 못했습니다');return false}

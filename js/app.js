@@ -7,3 +7,9 @@ function render(){const chg=tab!==lastTab;lastTab=tab;theme();document.getElemen
 setInterval(()=>{const t=document.getElementById('tm');if(t)t.textContent=clock(elapsed())},250);
 setInterval(()=>{fetchPrices();alerts();if(!document.getElementById('m').innerHTML&&!['market','detail','game'].includes(tab)&&!document.activeElement.matches('input'))render();if(tab==='market')list();if(tab==='detail'){const e=document.getElementById('dh');if(e)e.innerHTML=dhead(A(dsel))}},4000);
 setInterval(()=>{processBank();snap()},30000);processBank();render();addEventListener('load',()=>scrollTo(0,0));
+/* 확대·좌우 이동 차단 */
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
+document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
+addEventListener('wheel',e=>{if(e.ctrlKey)e.preventDefault()},{passive:false});
+/* 처음 실행하면 난이도 · 목표 배분 설정 */
+if(S.onb===0)newSim(true);

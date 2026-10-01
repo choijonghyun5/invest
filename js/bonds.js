@@ -53,8 +53,8 @@ function processBonds(){const now=bnow();let ch=0;
    if(N>=b.mat){const p=q*b.face*u;S.cash+=p;S.realized+=(b.face*u-h.c)*q;addTx('bond',a.n+' 만기 상환 ('+(+q.toFixed(4))+'좌)',p);note(a.n+' 만기 · 원금 '+won(p)+' 상환');delete S.hold[id];ch=1;break}}}
  return ch}
 /* 시장 탭 목록에 신규 발행 상품 */
-function bondRows(s){const L=Object.keys(BP).filter(k=>!s||BP[k].n.toLowerCase().includes(s)||(s.length>=2&&(BP[k].n+' '+k+' 채권 국채 bond treasury').toLowerCase().includes(s)));
- return L.length?`<div class="lab" style="margin:14px 0 4px">채권 · 신규 발행</div>`+L.map(k=>{const P=BP[k],Y=BY[k];return`<div class="row tap" onclick="openDetail('bp:${k}')"><div><b>${P.n}</b><div class="sub">채권 · 만기 ${P.term}년 · 이자 ${P.f===4?'3개월':'6개월'}마다</div></div><div style="text-align:right"><b>${Y.y.toFixed(2)}%</b><div class="sub">시장금리${Y.real?'':' · 샘플'}</div></div></div>`}).join(''):''}
+function bondRows(s,raw){const L=Object.keys(BP).filter(k=>!s||BP[k].n.toLowerCase().includes(s)||(s.length>=2&&(BP[k].n+' '+k+' 채권 국채 bond treasury').toLowerCase().includes(s)));
+ return L.length?(raw?'':`<div class="lab" style="margin:14px 0 4px">채권 · 신규 발행</div>`)+L.map(k=>{const P=BP[k],Y=BY[k];return`<div class="row tap" onclick="openDetail('bp:${k}')"><div><b>${P.n}</b><div class="sub">채권 · 만기 ${P.term}년 · 이자 ${P.f===4?'3개월':'6개월'}마다</div></div><div style="text-align:right"><b>${Y.y.toFixed(2)}%</b><div class="sub">시장금리${Y.real?'':' · 샘플'}</div></div></div>`}).join(''):''}
 /* 화면 */
 const kv=(l,v,c)=>`<div class="row"><span>${l}</span><b${c?` class="${c}"`:''}>${v}</b></div>`;
 const srcTxt=k=>BY[k].real?'실시간 금리 ('+BP[k].src+')':'샘플 금리 (시뮬레이션) · 실제 금리 연결 전';

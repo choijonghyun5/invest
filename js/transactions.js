@@ -11,7 +11,7 @@ function trade(id,side,q){
   let ai=0;if(isB){bondSettle(id);const r=Math.min(1,q/h.q);ai=(h.acc||0)*r*bu(a);h.acc=(h.acc||0)*(1-r)}
   S.cash+=gross-fee+ai;S.fees=(S.fees||0)+fee;S.realized+=(a.p-h.c)*q-fee;h.q-=q;if(h.q<1e-9)delete S.hold[id];addTx(a.k,a.n+' '+q+'개 매도',gross-fee);if(ai>0)addTx('interest',a.n+' 경과이자',ai)}
  snap();closeM();toast('체결 완료');render()}
-function sheet(inner){document.getElementById('m').innerHTML='<div class="ov" onclick="if(event.target===this)closeM()"><div class="sheet">'+inner+'</div></div>'}
+function sheet(inner,lock){document.getElementById('m').innerHTML='<div class="ov"'+(lock?'':' onclick="if(event.target===this)closeM()"')+'><div class="sheet">'+inner+'</div></div>'}
 function closeM(){document.getElementById('m').innerHTML=''}
 let side='buy';
 function openTrade(id){detail=id;const a=A(id),h=S.hold[id];
