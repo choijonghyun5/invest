@@ -1,0 +1,7 @@
+/* ===== stats by period ===== */
+function statsView(){const cut=Date.now()-sp*DAY,H=S.hist.filter(h=>h.t>=cut),V=(H.length?H:S.hist).map(h=>h.v).concat(total()),st=S.study.filter(x=>x.t>=cut),sec=st.reduce((x,y)=>x+y.sec,0),base=st.reduce((x,y)=>x+y.base,0),bon=st.reduce((x,y)=>x+y.bonus,0),pl=holdVal()-cost(),rs=V.map(v=>(v/S.start-1)*100),hi=Math.max(...rs),lo=Math.min(...rs);
+ const C=(l,v,c)=>`<div class="card stat"><div class="sub">${l}</div><div class="v ${c||''}" style="font-size:16px">${v}</div></div>`;
+ return`<div class="lab">통계</div><div class="seg" style="margin-top:0;overflow-x:auto">${[[7,'1주'],[30,'1개월'],[90,'3개월'],[180,'6개월'],[365,'1년'],[1e5,'전체']].map(([d,l])=>`<button style="flex:none;padding:7px 12px" class="${sp===d?'on':''}" onclick="sp=${d};render()">${l}</button>`).join('')}</div>
+ <div class="sub" style="margin:6px 2px">자산</div><div class="grid g2">${C('현재 총자산',won(total()))}${C('최고 총자산',won(Math.max(...V)))}${C('최저 총자산',won(Math.min(...V)))}${C('평균 총자산',won(V.reduce((x,y)=>x+y,0)/V.length))}</div>
+ <div class="sub" style="margin:12px 2px 6px">투자</div><div class="grid g2">${C('누적 투자금',won(cost()))}${C('누적 수익',sg(pl+S.realized),cl(pl+S.realized))}${C('최고 수익률',pc(hi),cl(hi))}${C('최저 수익률',pc(lo),cl(lo))}</div>
+ <div class="sub" style="margin:12px 2px 6px">공부</div><div class="grid g2">${C('누적 공부시간',hm(sec))}${C('누적 공부급여',won(base))}${C('누적 보너스',won(bon))}${C('시간당 평균 수입',sec?won((base+bon)/(sec/3600)):'—')}</div>`}
