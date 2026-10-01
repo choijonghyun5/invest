@@ -1,7 +1,8 @@
 /* ===== calc ===== */
 const price=id=>A(id).p;
 const holdVal=()=>Object.entries(S.hold).reduce((s,[id,h])=>s+h.q*price(id),0);
-const total=()=>S.cash+holdVal()+bankVal();
+const loanBal=()=>(S.loans||[]).reduce((s,l)=>s+l.bal,0);
+const total=()=>S.cash+holdVal()+bankVal()-loanBal(); // 순자산 = 자산 − 대출 잔액
 const cost=()=>Object.values(S.hold).reduce((s,h)=>s+h.q*h.c,0);
 const won=n=>(n<0?'-':'')+'₩'+Math.round(Math.abs(n)).toLocaleString('ko-KR');
 const sg=n=>(n>=0?'+':'-')+'₩'+Math.round(Math.abs(n)).toLocaleString('ko-KR');

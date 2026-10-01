@@ -70,7 +70,7 @@ async function gdRestore(){try{if(!gdOk())await gdAuth();const f=await gdFind();
 
 /* ---- 더보기 카드 ---- */
 function gdView(){const on=!!gdSt.on,st=gdMsg||gdSt.err;
- return`<div class="lab">구글 드라이브 백업</div><div class="card"><div class="sub" style="line-height:1.6">${on?`자동 백업 켜짐 · 마지막 백업 ${gdTime(gdSt.last)}`:'내 구글 드라이브의 앱 전용 폴더에 진행 상황을 자동으로 백업합니다. 다른 파일에는 접근하지 않습니다.'}</div>${st?`<div class="sub ${/실패|만료|차단|닫혔/.test(st)?'fall':''}" style="margin-top:6px;line-height:1.5">${st}</div>`:''}
+ return`<div class="lab">구글 드라이브 백업</div><div class="card"><div class="sub" style="line-height:1.6">${on?`자동 백업 켜짐 · 마지막 백업 ${gdTime(gdSt.last)}`:'내 구글 드라이브의 앱 전용 폴더에 진행 상황을 자동으로 백업합니다. 다른 파일에는 접근하지 않습니다.'}</div>${st?`<div class="sub ${/실패|만료|차단|닫혔/.test(st)?'rise':''}" style="margin-top:6px;line-height:1.5">${st}</div>`:''}
  ${on?`<div class="grid g2" style="gap:8px;margin-top:12px"><button class="btn s w" onclick="gdBackup(true)" ${gdBusy?'disabled':''}>지금 백업</button><button class="btn s w" onclick="gdRestore()" ${gdBusy?'disabled':''}>백업에서 복원</button></div>${gdOk()?'':'<button class="btn w" style="margin-top:8px" onclick="gdConnect()">다시 연결</button>'}<button class="btn s w" style="margin-top:8px" onclick="gdDisconnect()">연결 해제</button>`
  :`<button class="btn w" style="margin-top:12px" onclick="gdConnect()">구글 드라이브 연결</button><button class="btn s w" style="margin-top:8px" onclick="gdRestore()">기존 백업에서 복원</button>`}</div>`}
 const _gdMore=V.more;V.more=()=>_gdMore().replace('<div class="lab">화면</div>',gdView()+'<div class="lab">화면</div>');

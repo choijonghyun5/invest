@@ -64,3 +64,5 @@ table{touch-action:pan-x pan-y}
 @keyframes gtin{0%{opacity:0;transform:translate(-50%,-50%) scale(.82)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(.98)}}
 .fx{position:fixed;inset:0;z-index:31;pointer-events:none;overflow:hidden}.fx i{position:absolute;left:50%;top:50%;border-radius:2px}
 .chg{display:flex;gap:6px;margin:8px 0}.chg button{flex:1;padding:8px 0;font-size:13px}
+
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--up);margin-left:3px;vertical-align:super}

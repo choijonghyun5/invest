@@ -4,7 +4,7 @@ function setGoal(v){v=Math.max(0,Math.round(+v||0));S.goal=v;S.goalHit=v&&total(
 function goalView(){const T=total(),g=S.goal||0,p=g?Math.min(100,T/g*100):0;
  return`<div class="lab">목표 자산</div><div class="card"><div class="sub">목표 금액 (원) · 비우면 해제</div><input type="number" inputmode="numeric" value="${g||''}" placeholder="예: 20000000" onchange="setGoal(this.value)">${g?`<div class="sub" style="display:flex;justify-content:space-between;margin-top:14px"><span>${won(T)}</span><span>${p.toFixed(1)}%</span></div><div class="bar" style="margin-top:8px"><div style="width:${p}%;background:var(--ink)"></div></div><div class="sub" style="margin-top:8px">${T>=g?'목표 달성':'남은 금액 '+won(g-T)}</div>`:''}</div>`}
 function diffCard(){const Q=DIFF[S.diff]||DIFF.normal,bn=Q.tiers.filter(t=>t[1]>0).map(t=>`<div>${t[0]}시간 이상 +${Math.round(t[1]*100)}%</div>`).join(''),r=(l,v)=>`<div class="row dr" style="padding:6px 0;border:0"><span class="sub">${l}</span><span class="dv">${v}</span></div>`;
- return`<div class="lab">난이도</div><div class="card"><b>${Q.n}</b><div class="sub" style="margin-top:2px">새 시뮬레이션을 시작할 때 바꿀 수 있습니다</div><div style="margin-top:8px">${r('시간당 급여',won(Q.wage))}${r('공부 보너스',bn)}${r('게임 승리 확률','×'+Q.odds.toFixed(2))}${r('거래 수수료','0.015%')}</div></div>`}
+ return`<div class="lab">난이도</div><div class="card"><b>${Q.n}</b><div class="sub" style="margin-top:2px">새 시뮬레이션을 시작할 때 바꿀 수 있습니다</div><div style="margin-top:8px">${r('시간당 급여',won(Q.wage))}${r('공부 보너스',bn)}${r('게임 승리 확률','×'+Q.odds.toFixed(2))}${r('월 생활비',Q.bills?'약 '+won(Q.bills.reduce((x,b)=>x+b[1],0)):'없음')}${r('대출 금리','연 '+(Q.loan*100).toFixed(1)+'%')}${r('거래 수수료','0.015%')}</div></div>`}
 function goalCheck(){const g=S.goal||0;if(g>0&&total()>=g&&S.goalHit!==g){S.goalHit=g;note('목표 자산 달성 · '+won(g));save()}}
 setInterval(goalCheck,4000);
 const _more=V.more;V.more=()=>_more().replace('<div class="lab">게임</div>',goalView()+'<div class="lab">게임</div>');
@@ -17,15 +17,15 @@ function cardGame(){const w=gcsel==='hi'?(13-gcur)/13:(gcur-1)/13;
 
 /* ===== 월별 투자 기록 (초기자산 · 공부 수입 · 투자 손익 · 배당 · 이자 · 기타 · 월말 자산) ===== */
 let mall=false;
-monthView=function(){const M={},k=t=>{const d=new Date(t);return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')},g=t=>M[k(t)]=M[k(t)]||{inc:0,int:0,dv:0,etc:0,end:0};
+monthView=function(){const M={},k=t=>{const d=new Date(t);return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')},g=t=>M[k(t)]=M[k(t)]||{inc:0,int:0,dv:0,etc:0,liv:0,li:0,end:0};
  S.hist.forEach(h=>g(h.t).end=h.v);g(Date.now()).end=total();
  S.study.forEach(x=>g(x.t).inc+=x.base+x.bonus);
- S.tx.forEach(t=>{if(t.ty==='interest')g(t.t).int+=t.a;else if(t.ty==='div')g(t.t).dv+=t.a;else if(t.ty==='etc'&&!/초기 자금/.test(t.m))g(t.t).etc+=t.a});
- const K=Object.keys(M).sort(),all=K.map((m,i)=>{const pv=i?M[K[i-1]].end:S.start,o=M[m],pl=o.end-pv-o.inc-o.dv-o.int-o.etc;return{m,...o,pv,pl,r:(o.end/pv-1)*100}}).reverse(),rows=all.slice(0,4),shown=mall?all:all.slice(0,1);
+ S.tx.forEach(t=>{if(t.ty==='interest')g(t.t).int+=t.a;else if(t.ty==='div')g(t.t).dv+=t.a;else if(t.ty==='living')g(t.t).liv+=t.a;else if(t.ty==='loanint')g(t.t).li+=t.a;else if(t.ty==='etc'&&!/초기 자금/.test(t.m))g(t.t).etc+=t.a});
+ const K=Object.keys(M).sort(),all=K.map((m,i)=>{const pv=i?M[K[i-1]].end:S.start,o=M[m],pl=o.end-pv-o.inc-o.dv-o.int-o.etc-o.liv-o.li;return{m,...o,pv,pl,r:(o.end/pv-1)*100}}).reverse(),rows=all.slice(0,4),shown=mall?all:all.slice(0,1);
  const it=(l,v,c)=>`<div class="row" style="padding:3px 0;border:0"><span class="sub">${l}</span><span class="${c||''}" style="font-size:14px">${v}</span></div>`;
  return`<div class="lab">월별 기록 <span style="font-weight:400">· 월말 자산(백만원)</span></div><div class="card" style="margin-bottom:12px">${bars(rows.slice().reverse().map(r=>r.end/1e6),rows.slice().reverse().map(r=>r.m.slice(5)+"월"),rows.length-1,false)}</div>
  ${shown.map(r=>`<div class="card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px"><b>${r.m.replace('.','년 ').replace(/^(\d+년 )0?/,'$1')}월</b><span class="${cl(r.r)}" style="font-weight:600">${pc(r.r)}</span></div>
- ${it('초기자산',won(r.pv))}${it('공부 수입',sg(r.inc),cl(r.inc))}${it('투자 손익',sg(r.pl),cl(r.pl))}${it('배당',sg(r.dv),cl(r.dv))}${it('이자',sg(r.int),cl(r.int))}${it('기타',sg(r.etc),cl(r.etc))}<div class="row" style="padding:10px 0 0;margin-top:6px"><b>월말 자산</b><b>${won(r.end)}</b></div></div>`).join('')}${all.length>1?`<button class="btn s w" onclick="mall=!mall;render()">${mall?'지난 달 접기':'지난 달 보기 ('+(all.length-1)+'개월)'}</button>`:''}`};
+ ${it('초기자산',won(r.pv))}${it('공부 수입',sg(r.inc),cl(r.inc))}${it('투자 손익',sg(r.pl),cl(r.pl))}${it('배당',sg(r.dv),cl(r.dv))}${it('이자',sg(r.int),cl(r.int))}${r.liv?it('생활비',sg(r.liv),cl(r.liv)):''}${r.li?it('대출 이자',sg(r.li),cl(r.li)):''}${it('기타',sg(r.etc),cl(r.etc))}<div class="row" style="padding:10px 0 0;margin-top:6px"><b>월말 자산</b><b>${won(r.end)}</b></div></div>`).join('')}${all.length>1?`<button class="btn s w" onclick="mall=!mall;render()">${mall?'지난 달 접기':'지난 달 보기 ('+(all.length-1)+'개월)'}</button>`:''}`};
 /* ===== 게임 애니메이션 (동전 던지기 · 주사위 · 룰렛 · 카드) + 결과 토스트 ===== */
 const RED=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36],GL={coin:'h',dice:1,rl:0,rla:0};let gbusy=false;
 const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches,TM=ms=>RM?250:ms,SL=360/37;
@@ -61,7 +61,7 @@ let gch=10000;
 /* 게임머니 충전: 1 G = ₩1, 보유 현금에서 차감. 현금이 모자라면 충전 불가. 남은 게임머니가 있어도 언제든 추가 충전 가능 */
 function chargeBox(){const v=Math.floor(+gch||0),ok=v>0&&v<=S.cash;
  return`<div class="sub" style="margin-top:12px;display:flex;justify-content:space-between"><span>충전할 금액 (G)</span><span>보유 현금 ${won(S.cash)}</span></div><input id="chi" type="number" inputmode="numeric" min="1" value="${gch}" oninput="gch=+this.value;chPrev()"><div class="chg">${[[1e4,'1만'],[1e5,'10만'],[1e6,'100만'],[1e7,'1,000만']].map(([v,l])=>`<button class="btn s" onclick="gch=${v};render()">${l}</button>`).join('')}<button class="btn s" onclick="gch=Math.max(0,Math.floor(S.cash));render()">최대</button></div><div class="sub" id="chp" style="margin:2px 0 10px">${chText(v)}</div><button class="btn s w" id="chb" onclick="chargeG()" ${ok?'':'disabled'}>게임머니 충전</button>`}
-function chText(v){return v<=0?'1 G = ₩1 · 충전한 금액만큼 보유 현금에서 빠져나갑니다':v>S.cash?'<span class="fall">현금이 부족합니다 (부족 '+won(v-S.cash)+')</span>':'충전 후 보유 현금 '+won(S.cash-v)}
+function chText(v){return v<=0?'1 G = ₩1 · 충전한 금액만큼 보유 현금에서 빠져나갑니다':v>S.cash?'<span class="rise">현금이 부족합니다 (부족 '+won(v-S.cash)+')</span>':'충전 후 보유 현금 '+won(S.cash-v)}
 function chPrev(){const v=Math.floor(+gch||0),e=document.getElementById('chp'),b=document.getElementById('chb');if(e)e.innerHTML=chText(v);if(b)b.disabled=!(v>0&&v<=S.cash)}
 function chargeG(){const v=Math.floor(+gch||0);if(!(v>0))return toast('충전할 금액을 입력하세요');if(v>S.cash)return toast('현금이 부족합니다');
  S.cash-=v;S.gm+=v;addTx('etc','게임머니 충전 ('+gm(v)+')',-v);snap();gres='충전 +'+gm(v)+' (현금 -'+won(v)+')';save();render()}
